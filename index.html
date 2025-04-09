@@ -25,7 +25,7 @@
       justify-content: center;
     }
     #searchContainer {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       text-align: center;
     }
     #searchInput {
@@ -41,7 +41,7 @@
       border-radius: 5px;
       max-height: 400px; /* Adjust as needed */
       overflow-y: auto;
-      margin-bottom: 20px;
+      margin-top: 20px;  /* Add some space above messages if desired */
     }
     .message {
       border: 1px solid #ddd;
@@ -81,7 +81,7 @@
     #chatForm {
       display: flex;
       gap: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
     #chatInput {
       flex: 1;
@@ -155,19 +155,20 @@
   </div>
 </header>
 
+<!-- Form to send a new message (now above messages) -->
+<form id="chatForm">
+  <input type="text" id="chatInput" placeholder="Type your message..." required />
+  <button type="submit">Send</button>
+</form>
+
 <!-- Search Box -->
 <div id="searchContainer">
   <input type="text" id="searchInput" placeholder="Enter text to search messages...">
 </div>
 
+
 <!-- Chat messages container -->
 <div id="messagesContainer"></div>
-
-<!-- Form to send a new message -->
-<form id="chatForm">
-  <input type="text" id="chatInput" placeholder="Type your message..." required />
-  <button type="submit">Send</button>
-</form>
 
 <!-- Modal for setting/changing username -->
 <div id="userNameModal">
@@ -279,7 +280,7 @@
   /*******************************************
    * 5. Local Utility Functions
    *******************************************/
-  // Delete a message by its ID (optional in typical chat scenarios, but here for demonstration)
+  // Delete a message by its ID (optional)
   function deleteMessage(messageId) {
     if (!confirm("Are you sure you want to delete this message?")) return;
     messages = messages.filter(msg => msg.id !== messageId);
@@ -292,7 +293,7 @@
     renderMessages();
   }
 
-  // Edit a message by its ID (optional in typical chat scenarios)
+  // Edit a message by its ID (optional)
   function editMessage(msgObj) {
     const newText = prompt("Edit your message:", msgObj.text);
     if (newText !== null && newText.trim() !== "") {
@@ -322,8 +323,7 @@
       );
     }
 
-    // Sort messages by timestamp ascending or descending
-    // (Typically ascending for chat: oldest at top, newest at bottom)
+    // Sort messages by timestamp ascending
     messagesToRender.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
     messagesToRender.forEach(msg => {
@@ -334,7 +334,7 @@
       userInfoDiv.className = 'message-user-info';
       userInfoDiv.innerHTML = `<strong>${msg.userName}</strong> - ${new Date(msg.timestamp).toLocaleString()}`;
 
-      // If user is the owner of the message, show "delete" and "edit"
+      // If user is the owner, show delete and edit
       if (currentUserName && msg.userName === currentUserName) {
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = "Delete";
@@ -358,7 +358,7 @@
       messagesContainer.appendChild(msgDiv);
     });
 
-    // Scroll to bottom (optional: typical chat behavior)
+    // Scroll to bottom (optional for top input)
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
 
@@ -403,7 +403,7 @@
    * 8. Load Messages from Firebase (Realtime)
    *******************************************/
   if (firebaseConfigured && db) {
-    // Instead of a one-time get, use onSnapshot for real-time updates:
+    // Instead of one-time get, use onSnapshot for real-time updates
     db.collection('chatMessages').onSnapshot(querySnapshot => {
       messages = [];
       querySnapshot.forEach(doc => {
