@@ -77,6 +77,18 @@
       cursor: pointer;
       border-radius: 3px;
     }
+    /* Comment button styling (New) */
+    .comment-btn {
+      position: absolute;
+      top: 10px;
+      right: 140px;
+      background: #2ecc71;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
     /* Input area for new messages */
     #chatForm {
       display: flex;
@@ -141,6 +153,24 @@
       margin-left: 10px;
       font-weight: bold;
     }
+    /* Comments container (New) */
+    .comments-container {
+      margin-top: 10px;
+      margin-left: 20px; /* indent to visually group comments */
+      border-left: 2px solid #eee;
+      padding-left: 10px;
+    }
+    .comment {
+      border: 1px solid #f0f0f0;
+      margin: 5px 0;
+      padding: 5px;
+      border-radius: 4px;
+    }
+    .comment-header {
+      font-size: 0.8em;
+      color: #666;
+      margin-bottom: 3px;
+    }
   </style>
 </head>
 <body>
@@ -155,7 +185,7 @@
   </div>
 </header>
 
-<!-- Form to send a new message (now above messages) -->
+<!-- Form to send a new message -->
 <form id="chatForm">
   <input type="text" id="chatInput" placeholder="Type your message..." required />
   <button type="submit">Send</button>
@@ -165,7 +195,6 @@
 <div id="searchContainer">
   <input type="text" id="searchInput" placeholder="Enter text to search messages...">
 </div>
-
 
 <!-- Chat messages container -->
 <div id="messagesContainer"></div>
@@ -280,7 +309,7 @@
   /*******************************************
    * 5. Local Utility Functions
    *******************************************/
-  // Delete a message by its ID (optional)
+  // Delete a message by its ID
   function deleteMessage(messageId) {
     if (!confirm("Are you sure you want to delete this message?")) return;
     messages = messages.filter(msg => msg.id !== messageId);
@@ -293,7 +322,7 @@
     renderMessages();
   }
 
-  // Edit a message by its ID (optional)
+  // Edit a message by its ID
   function editMessage(msgObj) {
     const newText = prompt("Edit your message:", msgObj.text);
     if (newText !== null && newText.trim() !== "") {
@@ -308,6 +337,42 @@
     }
   }
 
+  // (New) Add a comment to a message
+  function addComment(msgId) {
+    if (!currentUserName) {
+      alert('Please set your name first.');
+      return;
+    }
+
+    const msgObj = messages.find(m => m.id === msgId);
+    if (!msgObj) return;
+
+    const commentText = prompt("Enter your comment:");
+    if (commentText !== null && commentText.trim() !== "") {
+      const newComment = {
+        commentId: Date.now(),
+        userName: currentUserName,
+        text: commentText.trim(),
+        timestamp: new Date().toISOString()
+      };
+      if (!msgObj.comments) {
+        msgObj.comments = [];
+      }
+      msgObj.comments.push(newComment);
+
+      // Save locally
+      localStorage.setItem('chatMessages', JSON.stringify(messages));
+
+      // Save to Firebase (if available)
+      if (firebaseConfigured && db) {
+        db.collection('chatMessages').doc(msgObj.id.toString()).set(msgObj)
+          .then(() => console.log("Comment added to Firebase"))
+          .catch(error => console.error("Error adding comment to Firebase", error));
+      }
+      renderMessages();
+    }
+  }
+
   /*******************************************
    * 6. Render Chat Messages (Filtered by Search)
    *******************************************/
@@ -315,7 +380,7 @@
     messagesContainer.innerHTML = '';
     const searchQuery = searchInput.value.trim().toLowerCase();
 
-    // Filter by search
+    // Filter by search (searches only the main message text)
     let messagesToRender = messages;
     if (searchQuery) {
       messagesToRender = messages.filter(msg =>
@@ -330,6 +395,7 @@
       const msgDiv = document.createElement('div');
       msgDiv.className = 'message';
 
+      // User info (name + timestamp)
       const userInfoDiv = document.createElement('div');
       userInfoDiv.className = 'message-user-info';
       userInfoDiv.innerHTML = `<strong>${msg.userName}</strong> - ${new Date(msg.timestamp).toLocaleString()}`;
@@ -349,16 +415,49 @@
         msgDiv.appendChild(editBtn);
       }
 
+      // (New) Comment button (any user can comment)
+      const commentBtn = document.createElement('button');
+      commentBtn.textContent = "Comment";
+      commentBtn.className = 'comment-btn';
+      commentBtn.addEventListener('click', () => addComment(msg.id));
+      msgDiv.appendChild(commentBtn);
+
       msgDiv.appendChild(userInfoDiv);
 
+      // The main message text
       const textDiv = document.createElement('div');
       textDiv.textContent = msg.text;
       msgDiv.appendChild(textDiv);
 
+      // (New) Render comments if any
+      if (msg.comments && msg.comments.length > 0) {
+        const commentsContainer = document.createElement('div');
+        commentsContainer.className = 'comments-container';
+
+        msg.comments.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        msg.comments.forEach(comment => {
+          const commentDiv = document.createElement('div');
+          commentDiv.className = 'comment';
+
+          const commentHeader = document.createElement('div');
+          commentHeader.className = 'comment-header';
+          commentHeader.innerHTML = `<strong>${comment.userName}</strong> - ${new Date(comment.timestamp).toLocaleString()}`;
+          
+          const commentText = document.createElement('div');
+          commentText.textContent = comment.text;
+
+          commentDiv.appendChild(commentHeader);
+          commentDiv.appendChild(commentText);
+          commentsContainer.appendChild(commentDiv);
+        });
+
+        msgDiv.appendChild(commentsContainer);
+      }
+
       messagesContainer.appendChild(msgDiv);
     });
 
-    // Scroll to bottom (optional for top input)
+    // Scroll to bottom (optional for top-input)
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
 
@@ -373,10 +472,12 @@
       id: Date.now(),
       userName: currentUserName,
       text,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      comments: [] // (New) Initialize an empty comments array
     };
     messages.push(newMsg);
     localStorage.setItem('chatMessages', JSON.stringify(messages));
+
     if (firebaseConfigured && db) {
       db.collection('chatMessages').doc(newMsg.id.toString()).set(newMsg)
         .then(() => console.log("Message saved to Firebase"))
@@ -403,7 +504,7 @@
    * 8. Load Messages from Firebase (Realtime)
    *******************************************/
   if (firebaseConfigured && db) {
-    // Instead of one-time get, use onSnapshot for real-time updates
+    // Use onSnapshot for real-time updates
     db.collection('chatMessages').onSnapshot(querySnapshot => {
       messages = [];
       querySnapshot.forEach(doc => {
