@@ -189,21 +189,31 @@
       width: 80%;
       max-width: 400px;
     }
+    /* Right side of header (username + menu button) */
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 15px; /* Add space between username and button */
+        position: relative; /* Needed for absolute positioning of the menu */
+    }
     /* Hamburger menu styling */
     .hamburger {
       font-size: 24px;
       background: none;
       border: none;
       cursor: pointer;
-      position: absolute;
-      top: 10px;
-      right: 10px;
+      /* position: absolute; */ /* Remove absolute positioning */
+      /* top: 10px; */
+      /* right: 10px; */
+      padding: 0; /* Remove default padding if any */
+      line-height: 1; /* Ensure tight fit */
     }
     .menu {
       display: none;
       position: absolute;
-      top: 40px;
-      right: 10px;
+      top: 100%; /* Position below the button */
+      right: 0; /* Align to the right of the container */
+      margin-top: 5px; /* Small gap */
       background: #fff;
       border: 1px solid #ccc;
       border-radius: 5px;
@@ -248,7 +258,7 @@
 <div class="chat-container"> <!-- Wrap content -->
     <header>
       <h1>Chat Page</h1>
-      <div style="display: flex; align-items: center;"> <!-- Wrapper for name and menu -->
+      <div class="header-right"> <!-- Use class for wrapper -->
           <div id="userNameDisplay"></div>
           <button class="hamburger" id="hamburgerBtn">☰</button>
           <div class="menu" id="menu">
