@@ -385,9 +385,19 @@
     // Filter by search (searches only the main message text)
     let messagesToRender = messages;
     if (searchQuery) {
-      messagesToRender = messages.filter(msg =>
-        msg.text.toLowerCase().includes(searchQuery)
-      );
+      messagesToRender = messages.filter(msg => {
+        if (msg.text.toLowerCase().includes(searchQuery)) {
+          return true;
+        }
+        if (msg.comments) {
+          for (const comment of msg.comments) {
+            if (comment.text.toLowerCase().includes(searchQuery)) {
+              return true;
+            }
+          }
+        }
+        return false;
+      });
     }
 
     // Sort messages by timestamp ascending
