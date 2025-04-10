@@ -4,9 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chat Page</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 
   <style>
     /* Basic page styling */
@@ -403,24 +405,24 @@
       // If user is the owner, show delete and edit
       if (currentUserName && msg.userName === currentUserName) {
         const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = "Delete";
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
         deleteBtn.className = 'delete-btn';
         deleteBtn.addEventListener('click', () => deleteMessage(msg.id));
         msgDiv.appendChild(deleteBtn);
 
         const editBtn = document.createElement('button');
-        editBtn.textContent = "Edit";
+        editBtn.innerHTML = '<i class="fas fa-edit"></i>';
         editBtn.className = 'edit-btn';
         editBtn.addEventListener('click', () => editMessage(msg));
         msgDiv.appendChild(editBtn);
       }
 
       // (New) Comment button (any user can comment)
-      const commentBtn = document.createElement('button');
-      commentBtn.textContent = "Comment";
-      commentBtn.className = 'comment-btn';
-      commentBtn.addEventListener('click', () => addComment(msg.id));
-      msgDiv.appendChild(commentBtn);
+        const commentBtn = document.createElement('button');
+        commentBtn.innerHTML = '<i class="fas fa-comment"></i>';
+        commentBtn.className = 'comment-btn';
+        commentBtn.addEventListener('click', () => addComment(msg.id));
+        msgDiv.appendChild(commentBtn);
 
       msgDiv.appendChild(userInfoDiv);
 
@@ -525,4 +527,3 @@
 </script>
 </body>
 </html>
-
