@@ -13,98 +13,166 @@
   <style>
     /* Basic page styling */
     body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 20px auto;
-      padding: 10px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; /* System fonts */
+      /* max-width: 600px; */ /* Remove max-width for potentially wider layout */
+      margin: 0; /* Remove default margin */
+      padding: 0; /* Remove default padding */
+      background-color: #f4f4f8; /* Subtle background */
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh; /* Ensure body takes full height */
+    }
+    .chat-container { /* New wrapper for centering content */
+        max-width: 700px; /* Slightly wider max-width */
+        width: 100%;
+        margin: 0 auto; /* Center the container */
+        background-color: #fff; /* White background for chat area */
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* Subtle shadow */
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1; /* Allow container to grow */
+        border-radius: 8px; /* Optional rounded corners for container */
+        overflow: hidden; /* Clip content like messages container */
+        margin-top: 20px; /* Space from top */
+        margin-bottom: 20px; /* Space from bottom */
     }
     header {
       text-align: center;
-      margin-bottom: 20px;
+      /* margin-bottom: 20px; */ /* Remove bottom margin */
       position: relative;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between; /* Space out title and menu */
+      padding: 15px 20px; /* Add padding */
+      background-color: #fff; /* White header */
+      border-bottom: 1px solid #e5e5e5; /* Separator line */
+    }
+    header h1 {
+        margin: 0; /* Remove default h1 margin */
+        font-size: 1.4em;
+        font-weight: 600;
     }
     #searchContainer {
-      margin-bottom: 10px;
+      /* margin-bottom: 10px; */
       text-align: center;
+      padding: 10px 20px; /* Add padding */
+      background-color: #f9f9f9; /* Slightly different bg */
+      border-bottom: 1px solid #e5e5e5;
     }
     #searchInput {
-      width: 80%;
-      padding: 8px;
+      width: 100%; /* Full width within container */
+      padding: 10px 15px; /* Adjust padding */
       margin: 0 auto;
       box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 20px; /* Rounded search bar */
+      font-size: 0.95em;
     }
     /* Chat messages container */
     #messagesContainer {
-      border: 1px solid #ccc;
-      padding: 10px;
-      border-radius: 5px;
-      max-height: 400px; /* Adjust as needed */
+      /* border: 1px solid #ccc; */ /* Remove border */
+      padding: 15px 20px; /* Adjust padding */
+      /* border-radius: 5px; */ /* Remove radius, handled by chat-container */
+      max-height: none; /* Remove fixed height */
       overflow-y: auto;
-      margin-top: 20px;  /* Add some space above messages if desired */
+      /* margin-top: 20px; */ /* Remove margin */
+      background-color: #fff; /* White background */
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1; /* Allow message area to fill space */
     }
     .message {
-      border: 1px solid #ddd;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
-      position: relative;
+      /* border: 1px solid #ddd; */ /* Remove border */
+      padding: 8px 12px;
+      margin: 5px 0; /* Reduced vertical margin */
+      border-radius: 15px; /* More rounded corners */
+      /* position: relative; */ /* Remove relative positioning */
+      max-width: 75%; /* Limit message width */
+      background-color: #e5e5ea; /* Default bubble color (like iOS incoming) */
+      align-self: flex-start; /* Default alignment to the left */
+      word-wrap: break-word; /* Ensure long words break */
+      display: flex; /* Use flex for internal layout */
+      flex-direction: column; /* Stack elements vertically */
+    }
+    .message.own {
+      align-self: flex-end; /* Align own messages to the right */
+      background-color: #0b93f6; /* Blue bubble color (like iOS outgoing) */
+      color: white;
     }
     .message-user-info {
-      margin-bottom: 5px;
-      font-size: 0.9em;
-      color: #555;
+      margin-bottom: 3px;
+      font-size: 0.8em;
+      color: #666; /* Darker grey for better contrast on light bg */
     }
-    .delete-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #e74c3c;
-      color: white;
+    .message.own .message-user-info {
+        color: #e0e0e0; /* Lighter color for dark bg */
+    }
+    .message-content {
+        margin-bottom: 5px; /* Space between text and buttons */
+    }
+    .message-actions {
+        display: flex;
+        gap: 5px; /* Space between buttons */
+        margin-top: 5px;
+        align-self: flex-end; /* Align buttons to the right within the bubble */
+    }
+    .delete-btn, .edit-btn, .comment-btn {
+      /* position: absolute; */ /* Remove absolute positioning */
+      /* top: 10px; */
+      /* right: 10px; */
+      background: rgba(0, 0, 0, 0.1); /* Subtle background */
+      color: inherit; /* Inherit color (white on blue, black on grey) */
       border: none;
-      padding: 5px 10px;
+      padding: 3px 8px; /* Smaller padding */
       cursor: pointer;
-      border-radius: 3px;
+      border-radius: 10px; /* Rounded buttons */
+      font-size: 0.8em; /* Smaller icon/text */
+      line-height: 1; /* Adjust line height for small buttons */
     }
-    .edit-btn {
-      position: absolute;
-      top: 10px;
-      right: 70px;
-      background: #3498db;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
-      border-radius: 3px;
+    .delete-btn:hover, .edit-btn:hover, .comment-btn:hover {
+        background: rgba(0, 0, 0, 0.2); /* Darker on hover */
     }
-    /* Comment button styling (New) */
-    .comment-btn {
-      position: absolute;
-      top: 10px;
-      right: 130px;
-      background: #2ecc71;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
-      border-radius: 3px;
-    }
+    /* Specific button colors if needed, but subtle background might be better */
+    /* .delete-btn { background: #e74c3c; } */
+    /* .edit-btn { background: #3498db; } */
+    /* .comment-btn { background: #2ecc71; } */
+
     /* Input area for new messages */
     #chatForm {
       display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 8px; /* Slightly reduced gap */
+      margin-top: 15px; /* Add space above the input */
+      padding: 10px; /* Add padding around the input area */
+      background-color: #f0f0f0; /* Light grey background */
+      border-top: 1px solid #ddd; /* Separator line */
+      border-radius: 0 0 5px 5px; /* Match container radius if needed */
     }
     #chatInput {
       flex: 1;
-      padding: 8px;
+      padding: 10px 12px; /* More padding */
       box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 18px; /* Rounded input field */
+      font-size: 1em;
     }
-    button {
-      padding: 8px 15px;
+    #chatForm button[type="submit"] { /* Target only the send button */
+      padding: 10px 18px; /* Adjust padding */
       cursor: pointer;
+      background-color: #0b93f6; /* Match outgoing bubble color */
+      color: white;
+      border: none;
+      border-radius: 18px; /* Rounded button */
+      font-weight: bold;
+      transition: background-color 0.2s ease; /* Smooth hover effect */
+    }
+    #chatForm button[type="submit"]:hover {
+        background-color: #0a84e0; /* Slightly darker on hover */
+    }
+    /* General button styling (might need adjustment if it affects others) */
+    button {
+      padding: 8px 15px; /* Default padding */
+      cursor: pointer;
+      /* Consider removing general background/border if causing conflicts */
     }
     /* Modal styling for setting/changing username */
     #userNameModal {
@@ -177,31 +245,36 @@
 </head>
 <body>
 
-<header>
-  <h1>Chat Page</h1>
-  <div id="userNameDisplay"></div>
-  <button class="hamburger" id="hamburgerBtn">☰</button>
-  <div class="menu" id="menu">
-    <button id="setUserNameBtn">Set/Change Name</button>
-    <button id="firebaseSetupBtn">Firebase Setup</button>
-  </div>
-</header>
+<div class="chat-container"> <!-- Wrap content -->
+    <header>
+      <h1>Chat Page</h1>
+      <div style="display: flex; align-items: center;"> <!-- Wrapper for name and menu -->
+          <div id="userNameDisplay"></div>
+          <button class="hamburger" id="hamburgerBtn">☰</button>
+          <div class="menu" id="menu">
+            <button id="setUserNameBtn">Set/Change Name</button>
+            <button id="firebaseSetupBtn">Firebase Setup</button>
+          </div>
+      </div>
+    </header>
 
-<!-- Form to send a new message -->
-<form id="chatForm">
-  <input type="text" id="chatInput" placeholder="Type your message..." required />
-  <button type="submit">Send</button>
-</form>
+    <!-- Search Box -->
+    <div id="searchContainer">
+      <input type="text" id="searchInput" placeholder="Search messages...">
+    </div>
 
-<!-- Search Box -->
-<div id="searchContainer">
-  <input type="text" id="searchInput" placeholder="Enter text to search messages...">
-</div>
+    <!-- Chat messages container -->
+    <div id="messagesContainer"></div>
 
-<!-- Chat messages container -->
-<div id="messagesContainer"></div>
+    <!-- Form to send a new message -->
+    <form id="chatForm">
+      <input type="text" id="chatInput" placeholder="Type your message..." required />
+      <button type="submit">Send</button>
+    </form>
 
-<!-- Modal for setting/changing username -->
+</div> <!-- End chat-container -->
+
+<!-- Modal for setting/changing username (keep outside main container) -->
 <div id="userNameModal">
   <h2>Set Your Name</h2>
   <label for="userNameInput">Your Name:</label>
@@ -406,40 +479,61 @@
     messagesToRender.forEach(msg => {
       const msgDiv = document.createElement('div');
       msgDiv.className = 'message';
+      // Add 'own' class if the message is from the current user
+      if (currentUserName && msg.userName === currentUserName) {
+        msgDiv.classList.add('own');
+      }
 
       // User info (name + timestamp)
       const userInfoDiv = document.createElement('div');
       userInfoDiv.className = 'message-user-info';
       userInfoDiv.innerHTML = `<strong>${msg.userName}</strong> - ${new Date(msg.timestamp).toLocaleString()}`;
+      msgDiv.appendChild(userInfoDiv); // Add user info first
 
-      // If user is the owner, show delete and edit
+      // The main message text
+      const textDiv = document.createElement('div');
+      textDiv.className = 'message-content'; // Add class for potential styling
+      textDiv.textContent = msg.text;
+      msgDiv.appendChild(textDiv);
+
+      // Container for action buttons
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'message-actions';
+
+      let hasActions = false;
+
+      // If user is the owner, show delete and edit buttons
       if (currentUserName && msg.userName === currentUserName) {
         const deleteBtn = document.createElement('button');
         deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
         deleteBtn.className = 'delete-btn';
+        deleteBtn.title = 'Delete'; // Add tooltip
         deleteBtn.addEventListener('click', () => deleteMessage(msg.id));
-        msgDiv.appendChild(deleteBtn);
+        actionsDiv.appendChild(deleteBtn);
 
         const editBtn = document.createElement('button');
         editBtn.innerHTML = '<i class="fas fa-edit"></i>';
         editBtn.className = 'edit-btn';
+        editBtn.title = 'Edit'; // Add tooltip
         editBtn.addEventListener('click', () => editMessage(msg));
-        msgDiv.appendChild(editBtn);
+        actionsDiv.appendChild(editBtn);
+        hasActions = true;
       }
 
-      // (New) Comment button (any user can comment)
-        const commentBtn = document.createElement('button');
-        commentBtn.innerHTML = '<i class="fas fa-comment"></i>';
-        commentBtn.className = 'comment-btn';
-        commentBtn.addEventListener('click', () => addComment(msg.id));
-        msgDiv.appendChild(commentBtn);
+      // Comment button (any user can comment)
+      const commentBtn = document.createElement('button');
+      commentBtn.innerHTML = '<i class="fas fa-comment"></i>';
+      commentBtn.className = 'comment-btn';
+      commentBtn.title = 'Comment'; // Add tooltip
+      commentBtn.addEventListener('click', () => addComment(msg.id));
+      actionsDiv.appendChild(commentBtn);
+      hasActions = true;
 
-      msgDiv.appendChild(userInfoDiv);
+      // Only append actions container if there are buttons
+      if (hasActions) {
+          msgDiv.appendChild(actionsDiv);
+      }
 
-      // The main message text
-      const textDiv = document.createElement('div');
-      textDiv.textContent = msg.text;
-      msgDiv.appendChild(textDiv);
 
       // (New) Render comments if any
       if (msg.comments && msg.comments.length > 0) {
