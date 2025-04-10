@@ -299,10 +299,36 @@
    *******************************************/
   let firebaseConfigured = false;
   let db = null;
-  const firebaseApiKey = localStorage.getItem('firebaseApiKey');
-  if (firebaseApiKey) {
+
+  // Function to get URL parameters
+  function getUrlParameter(name) {
+      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      var results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+  };
+
+  // 1. Check for API key in URL parameter first
+  let apiKeyFromUrl = getUrlParameter('apiKey');
+  let firebaseApiKeyToUse = null;
+
+  if (apiKeyFromUrl) {
+      console.log("Found API key in URL parameter.");
+      firebaseApiKeyToUse = apiKeyFromUrl;
+      // Optionally, save it to localStorage for future visits without the parameter
+      localStorage.setItem('firebaseApiKey', firebaseApiKeyToUse);
+  } else {
+      // 2. Fallback to localStorage if not in URL
+      firebaseApiKeyToUse = localStorage.getItem('firebaseApiKey');
+      if (firebaseApiKeyToUse) {
+          console.log("Using API key from localStorage.");
+      }
+  }
+
+  // 3. Initialize Firebase if we have an API key
+  if (firebaseApiKeyToUse) {
     const firebaseConfig = {
-      apiKey: firebaseApiKey,
+      apiKey: firebaseApiKeyToUse,
       authDomain: "homeinventory-4718c.firebaseapp.com",
       projectId: "homeinventory-4718c",
       storageBucket: "homeinventory-4718c.firebasestorage.app",
